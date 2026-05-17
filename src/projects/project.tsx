@@ -29,6 +29,7 @@ export default function Project() {
             description: "Site feito para o escoamento de produtos de uma empresa de alimentos.",
             image: queDeliciaAlimentos,
             progress: true,
+            
             deploy: "https://quedeliciaalimentos.com.br/",
         },
         {
