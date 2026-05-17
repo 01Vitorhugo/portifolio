@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import ImgVitor from "../../assets/imgVitor.png"
 import { Button } from "@base-ui/react";
 import { IconBrandLinkedinFilled } from "@tabler/icons-react";
-import { Navigate } from "react-router-dom";
+
 
 export default function DescriptionImg() {
     const [text1, setText1] = useState("");
