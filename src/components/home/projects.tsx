@@ -1,70 +1,146 @@
 import Project from "@/projects/project"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-    Card,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
+import { Card } from "@/components/ui/card"
 import { IconExternalLink } from "@tabler/icons-react"
+import { useEffect } from "react"
+import gsap from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Projects() {
 
     const { projects } = Project();
 
+    useEffect(() => {
+        const headerAnim = gsap.fromTo(".projects-header",
+            { y: 30, opacity: 0 },
+            {
+                y: 0,
+                opacity: 1,
+                duration: 0.2,
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: "#projects",
+                    start: "top 95%",
+                    toggleActions: "play reset play reset"
+                }
+            }
+        );
+
+        const cardsAnim = gsap.fromTo(".project-card",
+            { 
+                opacity: 0,
+                x: (index) => {
+                    const isMobile = window.innerWidth < 768;
+                    const offset = isMobile ? 30 : 80;
+                    if (index % 3 === 0) return -offset; 
+                    if (index % 3 === 2) return offset;  
+                    return 0;                            
+                },
+                y: (index) => {
+                    const isMobile = window.innerWidth < 768;
+                    const offset = isMobile ? 40 : 80;
+                    if (index % 3 === 1) return offset; 
+                    return 40;                          
+                }
+            },
+            {
+                opacity: 1,
+                x: 0,
+                y: 0,
+                duration: 0.7,
+                stagger: 0.1,
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: "#projects",
+                    start: "top 95%",
+                    toggleActions: "play reset play reset"
+                }
+            }
+        );
+
+        return () => {
+            headerAnim.scrollTrigger?.kill();
+            cardsAnim.scrollTrigger?.kill();
+        };
+    }, []);
+
     return (
-        <div className="flex flex-col items-center justify-center w-full px-10 pb-20 mt-10 " id="projects">
-            <h1 className="text-4xl font-bold text-white mb-12">Projetos</h1>
+        <div className="relative flex flex-col items-center justify-center w-full px-6 md:px-10 pb-24 mt-16 overflow-hidden scroll-mt-20 md:scroll-mt-28" id="projects">
+            <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] md:w-[600px] md:h-[600px] bg-[#36ADA3]/5 rounded-full blur-[100px] md:blur-[180px] pointer-events-none -z-10 animate-pulse" />
+            <div className="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] md:w-[600px] md:h-[600px] bg-[#1d2d44]/20 rounded-full blur-[100px] md:blur-[180px] pointer-events-none -z-10" />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10 w-full max-w-7xl">
+            <div className="flex flex-col items-center mb-16 text-center z-10 opacity-0 projects-header">
+                <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-[#36ADA3] tracking-tight">
+                    Projetos
+                </h1>
+                <div className="h-1 w-16 bg-gradient-to-r from-[#36ADA3] to-[#2c9188] rounded-full mt-3 shadow-[0_0_10px_rgba(54,173,163,0.5)]" />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 w-full max-w-7xl z-10 projects-grid bg-red-9">
                 {projects.map((project) => (
-                    <Card key={project.name} className="bg-[#1d2d44] border-[#3e5c76] text-slate-100 overflow-hidden shadow-lg 
-                    hover:shadow-[0_0_20px_rgba(62,92,118,0.4)] transition-all duration-300 flex flex-col py-0 pb-5 gap-5">
-
+                    <Card 
+                        key={project.name} 
+                        className={`relative bg-[#0b131e]/40 border border-[#36ADA3]/10 text-slate-100 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.12)] 
+                        hover:shadow-[0_0_35px_rgba(54,173,163,0.3)] hover:border-[#36ADA3]/40 hover:-translate-y-2 transition-all duration-500 flex flex-col justify-end h-[380px] md:h-[420px] rounded-2xl group opacity-0 project-card py-0 gap-0 ${project.deploy ? "cursor-pointer" : ""}`}
+                        onClick={project.deploy ? () => window.open(project.deploy, "_blank") : undefined}
+                    >
                         {project.image && (
-                            <div className="w-full h-52 overflow-hidden border-b border-[#3e5c76]/50 bg-[#0b131e] flex items-center justify-center">
+                            <>
                                 <img
                                     src={project.image}
                                     alt={project.name}
-                                    className="w-full h-full object-contain p-2 hover:scale-105 transition-transform duration-500"
+                                    className={`absolute inset-0 w-full h-full transition-transform duration-700 ease-out group-hover:scale-110 -z-30 ${
+                                        project.imageMode === "contain" 
+                                            ? "object-contain p-8 pb-32" 
+                                            : "object-cover"
+                                    }`}
                                 />
-                            </div>
+                                <div className="absolute inset-0 bg-[#0c1926]/20 mix-blend-multiply transition-opacity duration-500 group-hover:opacity-10 -z-20" />
+                                <div className="absolute inset-0 bg-[#36ADA3]/15 mix-blend-color transition-colors duration-500 group-hover:bg-[#36ADA3]/20 -z-20" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-[#090f16]/80 via-[#090f16]/30 to-transparent -z-10" />
+                            </>
                         )}
-
-                        <CardHeader className="flex-grow">
-                            <div className="flex justify-between items-center mb-2 gap-4">
-                                <CardTitle className="text-2xl font-bold text-white">{project.name}</CardTitle>
+                        <div className="px-6 pt-6 pb-6 md:px-8 md:pt-8 md:pb-8 flex flex-col relative z-10 w-full flex-grow justify-between">
+                            <div className="flex justify-between items-center gap-3">
                                 {project.progress === true && (
-                                    <Badge variant="secondary" className="bg-[#3e5c76] text-white hover:bg-[#2b4257] whitespace-nowrap">
+                                    <Badge variant="outline" className="bg-[#36ADA3]/25 text-[#36ADA3] border-[#36ADA3]/45 whitespace-nowrap flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-semibold text-xs backdrop-blur-md">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-[#36ADA3]" />
                                         Finalizado
                                     </Badge>
                                 )}
                                 {project.progress === false && (
-                                    <Badge variant="secondary" className="bg-[#3e5c76] text-white hover:bg-[#2b4257] whitespace-nowrap animate-pulse
-                                    items-center justify-center flex">
+                                    <Badge variant="outline" className="bg-amber-500/25 text-amber-400 border-amber-500/40 whitespace-nowrap flex items-center gap-1.5 px-2.5 py-0.5 rounded-full font-semibold text-xs backdrop-blur-md animate-pulse">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping" />
                                         Em andamento
                                     </Badge>
                                 )}
                             </div>
-                            <CardDescription className="text-slate-300 text-base leading-relaxed">
-                                {project.description}
-                            </CardDescription>
-                        </CardHeader>
+                            <div className="mt-auto flex flex-col gap-1.5">
+                                <h3 className="text-xl md:text-2xl font-black text-white tracking-tight leading-tight">
+                                    {project.name}
+                                </h3>
+
+                                <p className="text-slate-300 text-sm md:text-base leading-relaxed line-clamp-3 opacity-85 group-hover:opacity-100 transition-opacity duration-300">
+                                    {project.description}
+                                </p>
+                            </div>
+                        </div>
 
                         {project.deploy && (
-                            <CardFooter className="flex gap-4 pt-4 mt-auto bg-transparent border-t-1 border-[#3e5c76]/50">
-                                {project.deploy && (
-                                    <Button
-                                        className="flex-1 bg-[#3e5c76] text-white hover:bg-[#2b4257] cursor-pointer"
-                                        onClick={() => window.open(project.deploy, "_blank")}
-                                    >
-                                        <IconExternalLink size={18} className="mr-2" />
-                                        Acessar
-                                    </Button>
-                                )}
-                            </CardFooter>
+                            <Button
+                                className="w-full bg-[#36ADA3] hover:bg-[#2c9188] text-[#0b131e] hover:text-white font-bold
+                                 rounded-none cursor-pointer transition-all duration-300 flex items-center justify-center gap-2 h-12 shadow-none border-none relative z-20"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    window.open(project.deploy, "_blank");
+                                }}
+                            >
+                                <IconExternalLink size={18} />
+                                Acessar Projeto
+                            </Button>
                         )}
                     </Card>
                 ))}

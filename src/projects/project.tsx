@@ -15,7 +15,8 @@ export default function Project() {
             description: "Projeto em andamento para uma profissional de odontologia.",
             image: draLaylaCistina,
             progress: false,
-            deploy: "https://vitorhugo-dev.github.io/dra-layla-cristina-odontologia-",
+            deploy: "",
+            imageMode: "cover" as const,
         },
         {
             name: "Tirar Visto",
@@ -23,14 +24,15 @@ export default function Project() {
             image: tirarVisto,
             progress: true,
             deploy: "https://tirarvisto-phi.vercel.app/",
+            imageMode: "contain" as const,
         },
         {
             name: "Que delicia Alimentos",
             description: "Site feito para o escoamento de produtos de uma empresa de alimentos.",
             image: queDeliciaAlimentos,
             progress: true,
-            
             deploy: "https://quedeliciaalimentos.com.br/",
+            imageMode: "contain" as const,
         },
         {
             name: "FlexFlix",
@@ -38,6 +40,7 @@ export default function Project() {
             image: flexFlix,
             progress: true,
             deploy: "https://react-filmes-beta.vercel.app/",
+            imageMode: "contain" as const,
         },
         {
             name: "MKS Sistema",
@@ -45,6 +48,7 @@ export default function Project() {
             image: "",
             progress: true,
             deploy: "https://mks-desafio-three.vercel.app",
+            imageMode: "contain" as const,
         },
         {
             name: "Cards",
@@ -52,10 +56,10 @@ export default function Project() {
             image: "",
             progress: true,
             deploy: "https://cards-navy-xi.vercel.app",
+            imageMode: "contain" as const,
         },
     ]
 
-    // Percorre a lista de projetos e, se a imagem for vazia, atribui a imagem padrão
     const processedProjects = projects.map(project => {
         if (project.image === "") {
             return { ...project, image: semFoto };
