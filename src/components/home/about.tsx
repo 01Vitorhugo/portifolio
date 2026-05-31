@@ -185,13 +185,12 @@ export default function About() {
                             </div>
                         </div>
 
-                        {/* Interactive decorative line */}
+ 
                         <div className="w-full h-1 bg-[#36ADA3]/10 group-hover:bg-[#36ADA3]/30 transition-colors duration-500 mt-6 rounded-full" />
                     </div>
                 </div>
             </div>
 
-            {/* Skills Grid Section */}
             <div className="w-full max-w-7xl z-10 flex flex-col items-center">
                 <h3 className="text-xl md:text-2xl font-bold text-white mb-8 self-start flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-[#36ADA3]" />
