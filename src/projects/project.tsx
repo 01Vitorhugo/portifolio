@@ -3,6 +3,7 @@ import tirarVisto from "../assets/logo_tirarVisto.png"
 import queDeliciaAlimentos from "../assets/logo_queDeliciaAlimentos.png"
 import flexFlix from "../assets/flexFlix.png"
 import semFoto from "../assets/SemFoto.png"
+import ligaFacil from "../assets/ligaFacil.png"
 
 
 
@@ -10,12 +11,20 @@ export default function Project() {
 
 
     const projects = [
+        // {
+        //     name: "Dra. Layla Cristina",
+        //     description: "Projeto em andamento para uma profissional de odontologia.",
+        //     image: draLaylaCistina,
+        //     progress: false,
+        //     deploy: "",
+        //     imageMode: "cover" as const,
+        // },
         {
-            name: "Dra. Layla Cristina",
-            description: "Projeto em andamento para uma profissional de odontologia.",
-            image: draLaylaCistina,
+            name: "Liga Fácil",
+            description: "Site em desenvolvimento para projeto academico",
+            image: ligaFacil,
             progress: false,
-            deploy: "",
+            deploy: "https://ligafacil.vercel.app",
             imageMode: "cover" as const,
         },
         {
@@ -28,7 +37,7 @@ export default function Project() {
         },
         {
             name: "Que delicia Alimentos",
-            description: "Site feito para o escoamento de produtos de uma empresa de alimentos.",
+            description: "Site desenvolvido para uma empresa do ramo alimentício.",
             image: queDeliciaAlimentos,
             progress: true,
             deploy: "https://quedeliciaalimentos.com.br/",

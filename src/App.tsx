@@ -1,5 +1,7 @@
+import About from "./components/home/about"
 import DescriptionImg from "./components/home/descriptionImg"
 import Projects from "./components/home/projects"
+import Contact from "./components/home/contact"
 
 
 function App() {
@@ -7,6 +9,8 @@ function App() {
     <>
     <DescriptionImg />
     <Projects />
+    <About />
+    <Contact />
     </>
   )
 }

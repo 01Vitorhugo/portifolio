@@ -2,8 +2,8 @@ import Project from "@/projects/project"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { IconExternalLink } from "@tabler/icons-react"
-import { useEffect } from "react"
+import { IconExternalLink, IconChevronDown, IconChevronUp } from "@tabler/icons-react"
+import { useState, useEffect, useRef } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 
@@ -12,7 +12,11 @@ gsap.registerPlugin(ScrollTrigger);
 export default function Projects() {
 
     const { projects } = Project();
+    const [visibleCount, setVisibleCount] = useState(6);
+    const animatedIndices = useRef(new Set<number>());
+    const cardAnimsRef = useRef<Map<number, gsap.core.Tween>>(new Map());
 
+    
     useEffect(() => {
         const headerAnim = gsap.fromTo(".projects-header",
             { y: 30, opacity: 0 },
@@ -29,41 +33,81 @@ export default function Projects() {
             }
         );
 
-        const cardsAnim = gsap.fromTo(".project-card",
-            { 
-                opacity: 0,
-                x: (index) => {
-                    const isMobile = window.innerWidth < 768;
-                    const offset = isMobile ? 30 : 80;
-                    if (index % 3 === 0) return -offset; 
-                    if (index % 3 === 2) return offset;  
-                    return 0;                            
-                },
-                y: (index) => {
-                    const isMobile = window.innerWidth < 768;
-                    const offset = isMobile ? 40 : 80;
-                    if (index % 3 === 1) return offset; 
-                    return 40;                          
-                }
-            },
-            {
-                opacity: 1,
-                x: 0,
-                y: 0,
-                duration: 0.7,
-                stagger: 0.1,
-                ease: "power2.out",
-                scrollTrigger: {
-                    trigger: "#projects",
-                    start: "top 95%",
-                    toggleActions: "play reset play reset"
-                }
-            }
-        );
-
         return () => {
             headerAnim.scrollTrigger?.kill();
-            cardsAnim.scrollTrigger?.kill();
+            headerAnim.kill();
+        };
+    }, []);
+
+ 
+    useEffect(() => {
+        
+        const currentIndices = Array.from(animatedIndices.current);
+        currentIndices.forEach(idx => {
+            if (idx >= visibleCount) {
+                const anim = cardAnimsRef.current.get(idx);
+                if (anim) {
+                    anim.scrollTrigger?.kill();
+                    anim.kill();
+                    cardAnimsRef.current.delete(idx);
+                }
+                animatedIndices.current.delete(idx);
+            }
+        });
+
+        const cards = gsap.utils.toArray<HTMLElement>(".project-card");
+        
+        cards.forEach((card, index) => {
+            if (animatedIndices.current.has(index)) return;
+
+            const anim = gsap.fromTo(card,
+                {
+                    opacity: 0,
+                    x: () => {
+                        const isMobile = window.innerWidth < 768;
+                        const offset = isMobile ? 30 : 80;
+                        if (index % 3 === 0) return -offset;
+                        if (index % 3 === 2) return offset;
+                        return 0;
+                    },
+                    y: () => {
+                        const isMobile = window.innerWidth < 768;
+                        const offset = isMobile ? 40 : 80;
+                        if (index % 3 === 1) return offset;
+                        return 40;
+                    }
+                },
+                {
+                    opacity: 1,
+                    x: 0,
+                    y: 0,
+                    duration: 0.7,
+                    delay: (index % 3) * 0.15,
+                    ease: "power2.out",
+                    scrollTrigger: {
+                        trigger: "#projects",
+                        start: "top 95%",
+                        toggleActions: "play reset play reset"
+                    }
+                }
+            );
+
+            cardAnimsRef.current.set(index, anim);
+            animatedIndices.current.add(index);
+        });
+
+        ScrollTrigger.refresh();
+    }, [visibleCount]);
+
+    
+    useEffect(() => {
+        return () => {
+            cardAnimsRef.current.forEach(anim => {
+                anim.scrollTrigger?.kill();
+                anim.kill();
+            });
+            cardAnimsRef.current.clear();
+            animatedIndices.current.clear();
         };
     }, []);
 
@@ -80,9 +124,9 @@ export default function Projects() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 w-full max-w-7xl z-10 projects-grid bg-red-9">
-                {projects.map((project) => (
-                    <Card 
-                        key={project.name} 
+                {projects.slice(0, visibleCount).map((project) => (
+                    <Card
+                        key={project.name}
                         className={`relative bg-[#0b131e]/40 border border-[#36ADA3]/10 text-slate-100 overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.12)] 
                         hover:shadow-[0_0_35px_rgba(54,173,163,0.3)] hover:border-[#36ADA3]/40 hover:-translate-y-2 transition-all duration-500 flex flex-col justify-end h-[380px] md:h-[420px] rounded-2xl group opacity-0 project-card py-0 gap-0 ${project.deploy ? "cursor-pointer" : ""}`}
                         onClick={project.deploy ? () => window.open(project.deploy, "_blank") : undefined}
@@ -92,11 +136,10 @@ export default function Projects() {
                                 <img
                                     src={project.image}
                                     alt={project.name}
-                                    className={`absolute inset-0 w-full h-full transition-transform duration-700 ease-out group-hover:scale-110 -z-30 ${
-                                        project.imageMode === "contain" 
-                                            ? "object-contain p-8 pb-32" 
+                                    className={`absolute inset-0 w-full h-full transition-transform duration-700 ease-out group-hover:scale-110 -z-30 ${project.imageMode === "contain"
+                                            ? "object-contain p-8 pb-32"
                                             : "object-cover"
-                                    }`}
+                                        }`}
                                 />
                                 <div className="absolute inset-0 bg-[#0c1926]/20 mix-blend-multiply transition-opacity duration-500 group-hover:opacity-10 -z-20" />
                                 <div className="absolute inset-0 bg-[#36ADA3]/15 mix-blend-color transition-colors duration-500 group-hover:bg-[#36ADA3]/20 -z-20" />
@@ -145,6 +188,49 @@ export default function Projects() {
                     </Card>
                 ))}
             </div>
+
+            {projects.length > 6 && (
+                <div className="mt-12 z-10 flex items-center justify-center">
+                    <div className="flex items-center gap-3 bg-[#0b131e]/50 border border-[#36ADA3]/15 backdrop-blur-md rounded-full p-2 shadow-[0_0_25px_rgba(54,173,163,0.08)] hover:border-[#36ADA3]/30 hover:shadow-[0_0_35px_rgba(54,173,163,0.15)] transition-all duration-500">
+                        <button
+                            onClick={() => {
+                                if (visibleCount < projects.length) {
+                                    setVisibleCount(prev => prev + 3);
+                                }
+                            }}
+                            disabled={visibleCount >= projects.length}
+                            className={`p-3 rounded-full transition-all duration-300 flex items-center justify-center ${
+                                visibleCount >= projects.length
+                                    ? "text-slate-600 opacity-20 cursor-not-allowed"
+                                    : "text-[#36ADA3] hover:bg-[#36ADA3]/10 hover:shadow-[0_0_15px_rgba(54,173,163,0.25)] hover:scale-110 active:scale-95 cursor-pointer"
+                            }`}
+                            title="Ver mais projetos"
+                        >
+                            <IconChevronDown size={24} className={visibleCount < projects.length ? "animate-bounce" : ""} />
+                        </button>
+                        
+                        <div className="h-6 w-[1px] bg-slate-800/80" />
+                        
+                        <button
+                            onClick={() => {
+                                if (visibleCount > 6) {
+                                    setVisibleCount(6);
+                                    document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" });
+                                }
+                            }}
+                            disabled={visibleCount <= 6}
+                            className={`p-3 rounded-full transition-all duration-300 flex items-center justify-center ${
+                                visibleCount <= 6
+                                    ? "text-slate-600 opacity-20 cursor-not-allowed"
+                                    : "text-[#36ADA3] hover:bg-[#36ADA3]/10 hover:shadow-[0_0_15px_rgba(54,173,163,0.25)] hover:scale-110 active:scale-95 cursor-pointer"
+                            }`}
+                            title="Ver menos"
+                        >
+                            <IconChevronUp size={24} />
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
