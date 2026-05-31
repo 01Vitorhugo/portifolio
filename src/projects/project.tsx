@@ -1,4 +1,4 @@
-import draLaylaCistina from "../assets/draLaylaCristina.jpg"
+// import draLaylaCistina from "../assets/draLaylaCristina.jpg"
 import tirarVisto from "../assets/logo_tirarVisto.png"
 import queDeliciaAlimentos from "../assets/logo_queDeliciaAlimentos.png"
 import flexFlix from "../assets/flexFlix.png"
