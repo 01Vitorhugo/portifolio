@@ -1,4 +1,4 @@
-# React + TypeScript + Vite1
+# React + TypeScript + Vite
 
 
 
